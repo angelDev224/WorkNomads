@@ -201,6 +201,18 @@ done
 
 ---
 
+## CI/CD Deployment Secrets
+
+The CD pipeline (`.github/workflows/cd.yml`) deploys to Kubernetes and requires a kubeconfig secret.
+
+- Required secret: `KUBECONFIG` (preferred) or `KUBE_CONFIG` (fallback)
+- Expected value: full kubeconfig YAML content (multi-line is fine)
+- Scope: because the deploy job uses `environment: production`, define the secret in the `production` environment (recommended), or at repository level
+
+If neither secret is configured, the deploy workflow fails early with a clear error before running `kubectl`.
+
+---
+
 ## Project Structure
 
 ```

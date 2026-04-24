@@ -20,11 +20,29 @@ jobs:
         id: tag
         run: echo "TAG=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
+      - name: Resolve kubeconfig
+        id: kubeconfig
+        shell: bash
+        env:
+          KUBECONFIG_SECRET: ${{ secrets.KUBECONFIG }}
+          KUBE_CONFIG_SECRET: ${{ secrets.KUBE_CONFIG }}
+        run: |
+          KCFG="${KUBECONFIG_SECRET:-$KUBE_CONFIG_SECRET}"
+          if [ -z "$KCFG" ]; then
+            echo "::error::Missing kubeconfig secret. Set KUBECONFIG (preferred) or KUBE_CONFIG in repository or production environment secrets."
+            exit 1
+          fi
+          {
+            echo "kubeconfig<<EOF"
+            echo "$KCFG"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Configure kubectl
         uses: azure/k8s-set-context@v4
         with:
           method: kubeconfig
-          kubeconfig: ${{ secrets.KUBECONFIG }}
+          kubeconfig: ${{ steps.kubeconfig.outputs.kubeconfig }}
 
       - name: Apply namespace and config
         run: |
