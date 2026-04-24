@@ -1,0 +1,94 @@
+<mxfile host="app.diagrams.net" agent="Codex">
+  <diagram id="worknomads-architecture" name="Architecture">
+    <mxGraphModel dx="3014" dy="777" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Ingress + TLS&#xa;(api.worknomads.example.com)" vertex="1">
+          <mxGeometry height="70" width="220" x="260" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="api-gateway&#xa;Nginx :80" vertex="1">
+          <mxGeometry height="70" width="180" x="560" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="auth-service&#xa;FastAPI :8001" vertex="1">
+          <mxGeometry height="70" width="180" x="240" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="submission-service&#xa;FastAPI :8002" vertex="1">
+          <mxGeometry height="70" width="200" x="580" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="8" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="admin-service&#xa;FastAPI :8004" vertex="1">
+          <mxGeometry height="70" width="180" x="980" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="9" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="classifier-service&#xa;Queue consumer" vertex="1">
+          <mxGeometry height="70" width="180" x="590" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="11" parent="1" style="shape=cylinder;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#cce5ff;strokeColor=#4d88cc;" value="PostgreSQL" vertex="1">
+          <mxGeometry height="90" width="140" x="360" y="690" as="geometry" />
+        </mxCell>
+        <mxCell id="12" parent="1" style="shape=cylinder;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#cce5ff;strokeColor=#4d88cc;" value="MinIO / S3" vertex="1">
+          <mxGeometry height="90" width="140" x="1070" y="690" as="geometry" />
+        </mxCell>
+        <mxCell id="13" parent="1" style="shape=cylinder;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#cce5ff;strokeColor=#4d88cc;" value="Redis" vertex="1">
+          <mxGeometry height="90" width="120" x="170" y="690" as="geometry" />
+        </mxCell>
+        <mxCell id="14" edge="1" parent="1" source="3" style="endArrow=block;html=1;rounded=0;" target="4" value="HTTP(S)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="15" edge="1" parent="1" source="4" style="endArrow=block;html=1;rounded=0;" target="5" value="Route traffic">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="16" edge="1" parent="1" source="5" style="endArrow=block;html=1;" target="6" value="/v1/auth/*">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="17" edge="1" parent="1" source="5" style="endArrow=block;html=1;" target="7" value="/v1/submissions*">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="18" edge="1" parent="1" source="5" style="endArrow=block;html=1;" target="8" value="/v1/admin/*">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="19" edge="1" parent="1" source="7" style="endArrow=block;html=1;" target="10" value="publish classification task">
+          <mxGeometry relative="1" x="0.1351" y="-1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="20" edge="1" parent="1" source="10" style="endArrow=block;html=1;" target="9" value="consume queue">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="21" edge="1" parent="1" source="6" style="endArrow=block;html=1;" target="11" value="read/write">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="22" edge="1" parent="1" source="7" style="endArrow=block;html=1;" target="11" value="read/write">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="23" edge="1" parent="1" source="8" style="endArrow=block;html=1;" target="11" value="read/write">
+          <mxGeometry relative="1" x="-0.6266" y="-2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="24" edge="1" parent="1" source="9" style="endArrow=block;html=1;" target="11" value="write results">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="25" edge="1" parent="1" source="7" style="endArrow=block;html=1;" target="12" value="store photos">
+          <mxGeometry relative="1" x="0.2256" y="-1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="26" edge="1" parent="1" source="8" style="endArrow=block;html=1;" target="12" value="presigned URLs">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="27" edge="1" parent="1" source="6" style="endArrow=block;html=1;" target="13" value="refresh-token blacklist">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="8wUiy8PQAw8y1SMXy6Pm-27" parent="1" style="swimlane;startSize=23;" value="Kubernetes Namespace: WorkNomads" vertex="1">
+          <mxGeometry height="720" width="1130" x="120" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="10" parent="8wUiy8PQAw8y1SMXy6Pm-27" style="shape=cylinder;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="RabbitMQ" vertex="1">
+          <mxGeometry height="90" width="130" x="760" y="570" as="geometry" />
+        </mxCell>
+        <mxCell id="3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Browser / Client" vertex="1">
+          <mxGeometry height="60" width="140" x="-70" y="235" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

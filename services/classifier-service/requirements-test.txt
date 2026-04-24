@@ -1,0 +1,13 @@
+# Test dependencies — no compiled C/Rust extensions.
+# Works on any Python version (including 3.14) without MSVC or Build Tools.
+# The classifier logic (classifier.py) is pure Python — no DB or queue needed.
+#
+# Install: pip install -r requirements-test.txt
+# Run:     pytest -v
+
+pydantic-settings>=2.5.0
+structlog>=24.0.0
+pytest==8.3.3
+pytest-asyncio==0.24.0
+pytest-cov==5.0.0
+pytest-env==1.1.3

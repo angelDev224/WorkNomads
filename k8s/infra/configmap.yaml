@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: worknomads-config
+  namespace: worknomads
+data:
+  POSTGRES_USER: worknomads
+  POSTGRES_DB: worknomads
+  POSTGRES_HOST: postgres-service
+  POSTGRES_PORT: "5432"
+  REDIS_URL: redis://redis-service:6379/0
+  RABBITMQ_HOST: rabbitmq-service
+  RABBITMQ_PORT: "5672"
+  RABBITMQ_USER: worknomads
+  MINIO_ENDPOINT: minio-service:9000
+  MINIO_ACCESS_KEY: minioadmin
+  MINIO_BUCKET: worknomads-photos
+  MINIO_SECURE: "false"
+  APP_ENV: production
+  LOG_LEVEL: INFO
+  CLASSIFICATION_QUEUE: classification_tasks
+  CLASSIFIER_VERSION: v1.0.0
+  ACCESS_TOKEN_EXPIRE_MINUTES: "15"
+  REFRESH_TOKEN_EXPIRE_DAYS: "7"
+  JWT_ALGORITHM: HS256

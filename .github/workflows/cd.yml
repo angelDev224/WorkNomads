@@ -1,0 +1,64 @@
+name: CD — Deploy to Kubernetes
+
+on:
+  push:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository_owner }}/worknomads
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set image tag
+        id: tag
+        run: echo "TAG=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Configure kubectl
+        uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+
+      - name: Apply namespace and config
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/infra/configmap.yaml
+
+      - name: Apply secrets (via sealed-secrets or manual pre-deployment)
+        run: |
+          echo "Secrets should be managed via Sealed Secrets or External Secrets Operator."
+          echo "Run: kubectl apply -f k8s/infra/secrets.yaml  (DO NOT commit real values)"
+
+      - name: Update image tags in manifests
+        run: |
+          TAG=${{ steps.tag.outputs.TAG }}
+          SERVICES="auth-service submission-service classifier-service admin-service api-gateway"
+          for svc in $SERVICES; do
+            IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${svc}:${TAG}"
+            sed -i "s|ghcr.io/YOUR_ORG/worknomads-${svc}:latest|${IMAGE}|g" k8s/${svc}/deployment.yaml
+          done
+
+      - name: Deploy services
+        run: |
+          for svc in auth-service submission-service classifier-service admin-service api-gateway; do
+            kubectl apply -f k8s/${svc}/
+          done
+
+      - name: Apply ingress
+        run: kubectl apply -f k8s/api-gateway/ingress.yaml
+
+      - name: Wait for rollouts
+        run: |
+          for svc in auth-service submission-service admin-service api-gateway; do
+            kubectl rollout status deployment/${svc} -n worknomads --timeout=180s
+          done
+
+      - name: Verify deployment
+        run: kubectl get pods -n worknomads
