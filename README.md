@@ -223,6 +223,18 @@ The deploy workflow resolves secrets in this order:
 
 If both are empty, deployment fails during the preflight/resolve phase before any cluster changes are applied.
 
+### Runner network requirements
+
+`KUBECONFIG` provides credentials and endpoint details, but the GitHub Actions runner
+must still be able to reach the cluster API server (typically port `6443`).
+
+If deploy logs show connection refused/timeouts while running `kubectl`, keep the
+workflow logic and move deploy execution to a self-hosted runner in the same network
+as the cluster:
+
+- Example labels: `runs-on: [self-hosted, linux, k8s]`
+- Keep CI on GitHub-hosted runners, but run CD deploy from self-hosted for private clusters.
+
 ---
 
 ## Project Structure

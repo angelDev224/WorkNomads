@@ -11,6 +11,8 @@ env:
 jobs:
   deploy:
     name: Deploy
+    # For private clusters, switch to a self-hosted runner with network access
+    # to the Kubernetes API server (for example: [self-hosted, linux, k8s]).
     runs-on: ubuntu-latest
     # Environment-level secrets in "production" take precedence over repo secrets.
     environment: production
@@ -60,6 +62,14 @@ jobs:
         with:
           method: kubeconfig
           kubeconfig: ${{ steps.kubeconfig.outputs.kubeconfig }}
+
+      - name: Preflight cluster connectivity
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Checking access to cluster API server..."
+          kubectl cluster-info
+          kubectl get namespace worknomads >/dev/null 2>&1 || echo "Namespace worknomads not found yet (will be created)."
 
       - name: Apply namespace and config
         run: |
