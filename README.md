@@ -56,11 +56,9 @@ Architecture diagram source is available at `docs/architecture.drawio` (open in 
 ### Prerequisites
 - Docker ≥ 24 and Docker Compose v2
 
-### 1. Clone and configure
+### 1. Configure
 
 ```bash
-git clone https://github.com/YOUR_ORG/WorkNomads.git
-cd WorkNomads
 cp .env.example .env
 # Edit .env — at minimum set a strong JWT_SECRET_KEY:
 #   openssl rand -hex 32
