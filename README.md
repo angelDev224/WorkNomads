@@ -199,43 +199,6 @@ done
 
 ---
 
-## CI/CD Deployment Secrets
-
-The CD pipeline (`.github/workflows/cd.yml`) deploys to Kubernetes and requires a kubeconfig secret.
-
-- Required secret: `KUBECONFIG` (preferred) or `KUBE_CONFIG` (fallback)
-- Expected value: full kubeconfig YAML content (multi-line is fine)
-- Scope: because the deploy job uses `environment: production`, define the secret in the `production` environment (recommended), or at repository level
-
-If neither secret is configured, the deploy workflow fails early with a clear error before running `kubectl`.
-
-### Recommended setup (GitHub Environment: production)
-
-1. Open your repo on GitHub → `Settings` → `Environments` → `production`.
-2. Under **Environment secrets**, add `KUBECONFIG`.
-3. Paste the full kubeconfig YAML as the secret value.
-4. Keep `KUBE_CONFIG` only if you need backward compatibility with older workflow references.
-
-The deploy workflow resolves secrets in this order:
-
-1. `KUBECONFIG`
-2. `KUBE_CONFIG`
-
-If both are empty, deployment fails during the preflight/resolve phase before any cluster changes are applied.
-
-### Runner network requirements
-
-`KUBECONFIG` provides credentials and endpoint details, but the GitHub Actions runner
-must still be able to reach the cluster API server (typically port `6443`).
-
-If deploy logs show connection refused/timeouts while running `kubectl`, keep the
-workflow logic and move deploy execution to a self-hosted runner in the same network
-as the cluster:
-
-- Example labels: `runs-on: [self-hosted, linux, k8s]`
-- Keep CI on GitHub-hosted runners, but run CD deploy from self-hosted for private clusters.
-
----
 
 ## Project Structure
 
