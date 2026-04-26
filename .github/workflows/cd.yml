@@ -12,7 +12,7 @@ jobs:
   deploy:
     name: Deploy
     # Private cluster deploys require network reachability from the runner.
-    runs-on: [self-hosted, linux, k8s]
+    runs-on: [self-hosted, windows, k8s]
     # Environment-level secrets in "production" take precedence over repo secrets.
     environment: production
     steps:

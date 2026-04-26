@@ -1,0 +1,11 @@
+﻿{
+  "agentId": 21,
+  "agentName": "DESKTOP-AU74VF3",
+  "poolId": 1,
+  "poolName": "Default",
+  "serverUrl": "https://pipelinesghubeus24.actions.githubusercontent.com/O8nQywYlsvF5S4FcQsaGgTC7ms05JmYlvqYrGrRJPvEaJThr9L/",
+  "gitHubUrl": "https://github.com/angelDev224/WorkNomads",
+  "workFolder": "_work",
+  "useV2Flow": true,
+  "serverUrlV2": "https://broker.actions.githubusercontent.com/"
+}

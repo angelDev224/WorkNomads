@@ -41,3 +41,5 @@ secrets/
 *.pem
 *.key
 *.crt
+
+actions-runner/
