@@ -11,9 +11,8 @@ env:
 jobs:
   deploy:
     name: Deploy
-    # For private clusters, switch to a self-hosted runner with network access
-    # to the Kubernetes API server (for example: [self-hosted, linux, k8s]).
-    runs-on: ubuntu-latest
+    # Private cluster deploys require network reachability from the runner.
+    runs-on: [self-hosted, linux, k8s]
     # Environment-level secrets in "production" take precedence over repo secrets.
     environment: production
     steps:
