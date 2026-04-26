@@ -5,7 +5,9 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     # Database
-    database_url: str = "postgresql+asyncpg://worknomads:changeme@postgres:5432/worknomads"
+    database_url: str = (
+        "postgresql+asyncpg://worknomads:changeme@postgres:5432/worknomads"
+    )
 
     # Redis
     redis_url: str = "redis://redis:6379/0"

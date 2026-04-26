@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Cookie, Depends, Header, HTTPException, Request, Response, status
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError
 from sqlalchemy import select
@@ -19,8 +19,13 @@ from app.core.security import (
 from app.config import settings
 from app.db.models import RefreshToken, User
 from app.db.session import get_db
-from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse, UserResponse, VerifyResponse
-
+from app.schemas.auth import (
+    LoginRequest,
+    RegisterRequest,
+    TokenResponse,
+    UserResponse,
+    VerifyResponse,
+)
 
 router = APIRouter(prefix="/v1/auth", tags=["auth"])
 logger = structlog.get_logger()
@@ -41,7 +46,9 @@ def _set_refresh_cookie(response: Response, token: str) -> None:
     )
 
 
-@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED
+)
 async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.email == body.email))
     if result.scalar_one_or_none():
@@ -55,7 +62,9 @@ async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/login", response_model=TokenResponse)
-async def login(body: LoginRequest, response: Response, db: AsyncSession = Depends(get_db)):
+async def login(
+    body: LoginRequest, response: Response, db: AsyncSession = Depends(get_db)
+):
     result = await db.execute(select(User).where(User.email == body.email))
     user: User | None = result.scalar_one_or_none()
 
@@ -70,7 +79,8 @@ async def login(body: LoginRequest, response: Response, db: AsyncSession = Depen
     rt = RefreshToken(
         user_id=user.id,
         token_hash=refresh_hash,
-        expires_at=datetime.now(timezone.utc) + timedelta(days=settings.refresh_token_expire_days),
+        expires_at=datetime.now(timezone.utc)
+        + timedelta(days=settings.refresh_token_expire_days),
     )
     db.add(rt)
     await db.commit()
@@ -86,7 +96,7 @@ async def refresh(
     db: AsyncSession = Depends(get_db),
     redis=Depends(get_redis),
 ):
-    
+
     if not refresh_token:
         raise HTTPException(status_code=401, detail="No refresh token")
 
@@ -104,7 +114,9 @@ async def refresh(
     )
     rt: RefreshToken | None = result.scalar_one_or_none()
 
-    if not rt or rt.expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
+    if not rt or rt.expires_at.replace(tzinfo=timezone.utc) < datetime.now(
+        timezone.utc
+    ):
         raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
 
     user_result = await db.execute(select(User).where(User.id == rt.user_id))
@@ -122,7 +134,8 @@ async def refresh(
     new_rt = RefreshToken(
         user_id=user.id,
         token_hash=refresh_hash,
-        expires_at=datetime.now(timezone.utc) + timedelta(days=settings.refresh_token_expire_days),
+        expires_at=datetime.now(timezone.utc)
+        + timedelta(days=settings.refresh_token_expire_days),
     )
     db.add(new_rt)
     await db.commit()

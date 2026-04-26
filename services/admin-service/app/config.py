@@ -4,7 +4,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    database_url: str = "postgresql+asyncpg://worknomads:changeme@postgres:5432/worknomads"
+    database_url: str = (
+        "postgresql+asyncpg://worknomads:changeme@postgres:5432/worknomads"
+    )
     minio_endpoint: str = "minio:9000"
     minio_public_endpoint: str | None = None
     minio_access_key: str = "minioadmin"

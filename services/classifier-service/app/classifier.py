@@ -6,6 +6,7 @@ In production replace this module with a real ML inference pipeline
 remote inference endpoint). The interface contract is:
     classify(photo_key: str) -> ClassificationResult
 """
+
 import hashlib
 import json
 import random

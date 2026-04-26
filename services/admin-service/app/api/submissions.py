@@ -15,6 +15,7 @@ from app.schemas.admin import (
     SubmissionListAdminResponse,
 )
 import structlog
+
 logger = structlog.get_logger()
 router = APIRouter(prefix="/v1/admin/submissions", tags=["admin-submissions"])
 
@@ -22,6 +23,7 @@ router = APIRouter(prefix="/v1/admin/submissions", tags=["admin-submissions"])
 async def _photo_url(photo_key: str) -> Optional[str]:
     try:
         from app.config import settings
+
         endpoint = settings.minio_public_endpoint or settings.minio_endpoint
         scheme = "https" if settings.minio_secure else "http"
 
@@ -30,6 +32,7 @@ async def _photo_url(photo_key: str) -> Optional[str]:
 
         from miniopy_async import Minio
         from datetime import timedelta
+
         endpoint = settings.minio_public_endpoint or settings.minio_endpoint
         client = Minio(
             endpoint,
@@ -116,10 +119,14 @@ async def list_submissions(
     total = total_r.scalar_one()
 
     offset = (page - 1) * per_page
-    rows = await db.execute(q.order_by(Submission.created_at.desc()).offset(offset).limit(per_page))
+    rows = await db.execute(
+        q.order_by(Submission.created_at.desc()).offset(offset).limit(per_page)
+    )
     subs = rows.scalars().all()
     items = [await _enrich(s, db) for s in subs]
-    return SubmissionListAdminResponse(data=items, total=total, page=page, per_page=per_page)
+    return SubmissionListAdminResponse(
+        data=items, total=total, page=page, per_page=per_page
+    )
 
 
 @router.get("/{submission_id}", response_model=SubmissionAdminResponse)
@@ -146,10 +153,12 @@ async def delete_submission(
     if not sub:
         raise HTTPException(status_code=404, detail="Submission not found")
     sub.deleted_at = datetime.utcnow()
-    db.add(AuditLog(
-        admin_id=uuid.UUID(payload["sub"]),
-        action="delete_submission",
-        target_type="submission",
-        target_id=str(submission_id),
-    ))
+    db.add(
+        AuditLog(
+            admin_id=uuid.UUID(payload["sub"]),
+            action="delete_submission",
+            target_type="submission",
+            target_id=str(submission_id),
+        )
+    )
     await db.commit()

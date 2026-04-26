@@ -29,7 +29,9 @@ async def process_message(message: aio_pika.abc.AbstractIncomingMessage) -> None
         try:
             result = classify(photo_key)
         except Exception as exc:
-            logger.error("classification failed", submission_id=submission_id, error=str(exc))
+            logger.error(
+                "classification failed", submission_id=submission_id, error=str(exc)
+            )
             async with AsyncSessionLocal() as db:
                 await db.execute(
                     update(Submission)
@@ -52,13 +54,15 @@ async def process_message(message: aio_pika.abc.AbstractIncomingMessage) -> None
                 row.classifier_version = settings.classifier_version
                 row.classified_at = datetime.now(timezone.utc)
             else:
-                db.add(Result(
-                    submission_id=uuid.UUID(submission_id),
-                    classifier_version=settings.classifier_version,
-                    label=result.label,
-                    confidence=result.confidence,
-                    details=result.details,
-                ))
+                db.add(
+                    Result(
+                        submission_id=uuid.UUID(submission_id),
+                        classifier_version=settings.classifier_version,
+                        label=result.label,
+                        confidence=result.confidence,
+                        details=result.details,
+                    )
+                )
 
             await db.execute(
                 update(Submission)
@@ -77,6 +81,8 @@ async def start_consumer() -> None:
         channel = await connection.channel()
         await channel.set_qos(prefetch_count=5)
         queue = await channel.declare_queue(settings.classification_queue, durable=True)
-        logger.info("listening for classification tasks", queue=settings.classification_queue)
+        logger.info(
+            "listening for classification tasks", queue=settings.classification_queue
+        )
         await queue.consume(process_message)
         await asyncio.Future()  # run forever

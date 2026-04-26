@@ -8,9 +8,9 @@ from app.config import settings
 
 ALLOWED_MIME_TYPES = {"image/jpeg", "image/png", "image/webp"}
 ALLOWED_MAGIC = {
-    b"\xff\xd8\xff",           # JPEG
-    b"\x89PNG\r\n\x1a\n",     # PNG
-    b"RIFF",                   # WEBP (starts with RIFF....WEBP)
+    b"\xff\xd8\xff",  # JPEG
+    b"\x89PNG\r\n\x1a\n",  # PNG
+    b"RIFF",  # WEBP (starts with RIFF....WEBP)
 }
 
 _minio: Minio | None = None
@@ -81,6 +81,7 @@ async def get_presigned_url(key: str, expires: int = 3600) -> str:
 
     # Private bucket mode: return pre-signed GET URL.
     from datetime import timedelta
+
     client = get_public_minio()
     url = await client.presigned_get_object(
         settings.minio_bucket, key, expires=timedelta(seconds=expires)

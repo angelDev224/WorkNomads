@@ -5,7 +5,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.api.submissions import router as submissions_router
 from app.api.users import router as users_router
-from app.db.models import AuditLog, Base
+from app.db.models import AuditLog
 from app.db.session import engine
 
 logger = structlog.get_logger()

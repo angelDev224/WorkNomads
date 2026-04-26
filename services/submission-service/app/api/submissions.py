@@ -1,8 +1,16 @@
-import json
 import uuid
 from typing import Optional
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Query,
+    UploadFile,
+    status,
+)
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,7 +25,6 @@ from app.schemas.submissions import (
     SubmissionCreate,
     SubmissionListResponse,
     SubmissionResponse,
-    VALID_GENDERS,
 )
 
 router = APIRouter(prefix="/v1/submissions", tags=["submissions"])
