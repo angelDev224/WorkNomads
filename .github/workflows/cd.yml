@@ -12,6 +12,7 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
+    # Environment-level secrets in "production" take precedence over repo secrets.
     environment: production
     steps:
       - uses: actions/checkout@v4
@@ -20,6 +21,14 @@ jobs:
         id: tag
         run: echo "TAG=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
+      - name: Preflight kubeconfig secret requirements
+        shell: bash
+        run: |
+          echo "Deploy environment: production"
+          echo "Expected secret names: KUBECONFIG (preferred), KUBE_CONFIG (fallback)"
+          echo "Recommended location: GitHub Environment secret (production)"
+          echo "Accepted format: full kubeconfig YAML (multi-line supported)"
+
       - name: Resolve kubeconfig
         id: kubeconfig
         shell: bash
@@ -27,11 +36,19 @@ jobs:
           KUBECONFIG_SECRET: ${{ secrets.KUBECONFIG }}
           KUBE_CONFIG_SECRET: ${{ secrets.KUBE_CONFIG }}
         run: |
-          KCFG="${KUBECONFIG_SECRET:-$KUBE_CONFIG_SECRET}"
+          if [ -n "$KUBECONFIG_SECRET" ]; then
+            KCFG="$KUBECONFIG_SECRET"
+            SOURCE="KUBECONFIG"
+          else
+            KCFG="$KUBE_CONFIG_SECRET"
+            SOURCE="KUBE_CONFIG"
+          fi
           if [ -z "$KCFG" ]; then
-            echo "::error::Missing kubeconfig secret. Set KUBECONFIG (preferred) or KUBE_CONFIG in repository or production environment secrets."
+            echo "::error::Missing kubeconfig secret for production deploy."
+            echo "::error::Set KUBECONFIG (preferred) or KUBE_CONFIG in GitHub Environment: production."
             exit 1
           fi
+          echo "::notice::Using ${SOURCE} secret for kubectl context."
           {
             echo "kubeconfig<<EOF"
             echo "$KCFG"

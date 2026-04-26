@@ -211,6 +211,20 @@ The CD pipeline (`.github/workflows/cd.yml`) deploys to Kubernetes and requires 
 
 If neither secret is configured, the deploy workflow fails early with a clear error before running `kubectl`.
 
+### Recommended setup (GitHub Environment: production)
+
+1. Open your repo on GitHub → `Settings` → `Environments` → `production`.
+2. Under **Environment secrets**, add `KUBECONFIG`.
+3. Paste the full kubeconfig YAML as the secret value.
+4. Keep `KUBE_CONFIG` only if you need backward compatibility with older workflow references.
+
+The deploy workflow resolves secrets in this order:
+
+1. `KUBECONFIG`
+2. `KUBE_CONFIG`
+
+If both are empty, deployment fails during the preflight/resolve phase before any cluster changes are applied.
+
 ---
 
 ## Project Structure
