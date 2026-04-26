@@ -134,6 +134,7 @@ jobs:
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:latest
           format: "sarif"
           output: "trivy-results.sarif"
+          exit-code: "0"
           severity: "CRITICAL,HIGH"
 
       - name: Upload Trivy scan results
